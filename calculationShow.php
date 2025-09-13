@@ -55,7 +55,7 @@ while($r=$res->fetch_assoc()){
 <style>
   :root{--bg:#f6f8fb;--surface:#fff;--text:#111;--muted:#5b6675;--border:#e3e6eb;--btn:#0d6efd;--btn-text:#fff;--pos:#157347;--neg:#dc3545}
   body{font-family:system-ui,Segoe UI,Arial;background:var(--bg);margin:0;color:var(--text)}
-  .shell{max-width:1100px;margin:20px auto;padding:0 12px}
+  .shell{max-width:1500px;margin:20px auto;padding:0 12px}
   .btn{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--btn);color:var(--btn-text);text-decoration:none;cursor:pointer}
   .btn.link{background:#eef2f7;color:#333}
   .btn.secondary{background:#eef5ff;color:#0d6efd;border-color:#cfe2ff}

@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     :root{--bg:#f6f8fb;--surface:#fff;--text:#111;--border:#e3e6eb;--btn:#0d6efd;--btn-text:#fff;--pill:#eef5ff;--pill-text:#0d6efd}
     *{box-sizing:border-box}
     body{font-family:system-ui,Segoe UI,Arial;background:var(--bg);margin:0;color:var(--text)}
-    .shell{max-width:1000px;margin:20px auto;padding:0 12px}
+    .shell{max-width:1500px;margin:20px auto;padding:0 12px}
     .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
     .left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .btn{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--btn);color:var(--btn-text);text-decoration:none;cursor:pointer}

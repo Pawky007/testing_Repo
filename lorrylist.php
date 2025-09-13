@@ -59,7 +59,7 @@ $res = $mysqli->query("SELECT id, reg_number, truck_type FROM trucks ORDER BY re
 <style>
   :root{--bg:#f6f8fb;--surface:#fff;--text:#111;--muted:#5b6675;--border:#e3e6eb;--btn:#0d6efd;--btn-text:#fff;--link:#0d6efd}
   body{font-family:system-ui,Segoe UI,Arial;background:var(--bg);margin:0;color:var(--text)}
-  .shell{max-width:1000px;margin:20px auto;padding:0 12px}
+  .shell{max-width:1500px;margin:20px auto;padding:0 12px}
   .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   .btn{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--btn);color:var(--btn-text);text-decoration:none;cursor:pointer}
   .btn.link{background:transparent;color:#333}
@@ -67,6 +67,7 @@ $res = $mysqli->query("SELECT id, reg_number, truck_type FROM trucks ORDER BY re
   .btn.danger{background:#dc3545}
   .card{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .grid input{width: 500px;}
   label{font-size:12px;color:#555}
   input,select{width:100%;padding:8px;border:1px solid var(--border);border-radius:10px}
   .form-actions{margin-top:10px;display:flex;gap:10px}
