@@ -63,6 +63,9 @@ body {
 .sidebar .menu li:hover i {
   color: #007bff;
 }
+.menu a {
+  text-decoration: none;
+}
 
 /* Help Card */
 .help-card {
