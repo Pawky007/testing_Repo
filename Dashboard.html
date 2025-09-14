@@ -17,42 +17,42 @@
     />
   </head>
   <body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     <div class="container">
-      <aside class="sidebar">
-        <img src="Image/Logo.png" alt="HaulPro Logo" width="200" />
+      <aside class="sidebar" id="sidebar">
+        <img src="Image/Logo.png" alt="HaulPro Logo" width="160" />
         <h3>HaulPro</h3>
         <ul class="menu">
           <li class="active">
-            <a href="#"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#"><img src="Image/dashboard.png" alt="" />Dashboard</a>
           </li>
           <li>
-            <a href="#"><i class="fa fa-chart-line"></i> Analytics</a>
+            <a href="#"><img src="Image/chart.png" alt="" />Analytics</a>
           </li>
           <li>
-            <a href="#"><i class="fa fa-truck"></i> Vehicle</a>
+            <a href="#"><img src="Image/car.png" alt="" />Vehicle</a>
           </li>
           <li>
-            <a href="#"><i class="fa fa-cogs"></i> Add Trips</a>
+            <a href="#"><img src="Image/plus.png" alt="" />Add Trips</a>
           </li>
           <li>
-            <a href="#"><i class="fa fa-credit-card"></i> Payment Method</a>
+            <a href="#"><img src="Image/wallet.png" alt="" />Payment Method</a>
           </li>
           <li>
-            <a href="#"><i class="fa fa-users"></i> Transporter List</a>
-          </li>
-          <li>
-            <a href="#"><i class="fa fa-user-tie"></i> Lorry Owner List</a>
-          </li>
-          <li>
-            <a href="http://localhost/testing_Repo/lorrylist.php"
-              ><i class="fa fa-truck-moving"></i> Lorry List</a
+            <a href="Lorry_owner.php"
+              ><img src="Image/businessman.png" alt="" />Lorry Owner List</a
             >
           </li>
           <li>
-            <a href="#"><i class="fa fa-cogs"></i> Setting</a>
+            <a href="lorrylist.php"
+              ><img src="Image/truck.png" alt="" />Lorry List</a
+            >
           </li>
           <li>
-            <a href="#"><i class="fa fa-question-circle"></i> FAQ</a>
+            <a href="#"><img src="Image/settings.png" alt="" />Settings</a>
+          </li>
+          <li>
+            <a href="#"><img src="Image/faq.png" alt="" />FAQ</a>
           </li>
         </ul>
         <div class="help-card">
@@ -65,7 +65,7 @@
         </div>
       </aside>
 
-      <main class="dashboard">
+      <main class="dashboard" id="dashboard">
         <div class="header">
           <h1>Dashboard</h1>
           <div class="header-buttons">
@@ -128,7 +128,6 @@
         <div class="main-content">
           <div class="map-container">
             <h3 class="map-heading">Live GPS Tracking</h3>
-            <div id="map" style="height: 0; width: 100%"></div>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3649.9008600456577!2d90.42483137604525!3d23.822124178621525!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c711d13bbec7%3A0xc47f7c3e8e2263f2!2sAmerican%20International%20University%20-%20Bangladesh%20(AIUB)!5e0!3m2!1sen!2sbd!4v1757267155206!5m2!1sen!2sbd"
               width="100%"
@@ -136,7 +135,6 @@
               style="border: 0"
               allowfullscreen=""
               loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
 
@@ -162,6 +160,12 @@
         </div>
       </div>
     </footer>
-    <script src="Transition.js"></script>
+
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("dashboard").classList.toggle("shifted");
+      }
+    </script>
   </body>
 </html>

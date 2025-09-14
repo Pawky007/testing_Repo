@@ -4,11 +4,16 @@ require __DIR__.'/db.php';
 $truck_id = isset($_GET['truck_id']) ? (int)$_GET['truck_id'] : 0;
 if ($truck_id<=0) die('Missing truck_id');
 
-$ts = $mysqli->prepare("SELECT reg_number, truck_type FROM trucks WHERE id=?");
+// ✅ Select from lorry_owners instead of trucks
+$ts = $mysqli->prepare("SELECT vehicle_no, truck_type FROM lorry_owners WHERE id=?");
 $ts->bind_param('i',$truck_id);
 $ts->execute();
 $truck = $ts->get_result()->fetch_assoc();
-if (!$truck) die('Truck not found');
+
+// If no truck found
+if (!$truck) {
+    die('<div style="padding:20px; font-family:sans-serif; color:red;">⚠ Lorry not found</div>');
+}
 
 $today = date('Y-m-d');
 $default_from = date('Y-m-d', strtotime('-30 days'));
@@ -24,6 +29,7 @@ if ($range === 'all') {
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/',$from)) $from = $default_from;
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/',$to))   $to   = $today;
 
+// ✅ Trips table query stays same
 $sql = "SELECT t.*, d.name AS driver_name, d.phone AS driver_phone
         FROM trips t
         JOIN drivers d ON d.id = t.driver_id
@@ -51,36 +57,49 @@ while($r=$res->fetch_assoc()){
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Trips — <?= htmlspecialchars($truck['reg_number']) ?></title>
+<title>Trips — <?= htmlspecialchars($truck['vehicle_no']) ?></title>
 <style>
-  :root{--bg:#f6f8fb;--surface:#fff;--text:#111;--muted:#5b6675;--border:#e3e6eb;--btn:#0d6efd;--btn-text:#fff;--pos:#157347;--neg:#dc3545}
-  body{font-family:system-ui,Segoe UI,Arial;background:var(--bg);margin:0;color:var(--text)}
-  .shell{max-width:1500px;margin:20px auto;padding:0 12px}
-  .btn{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--btn);color:var(--btn-text);text-decoration:none;cursor:pointer}
-  .btn.link{background:#eef2f7;color:#333}
-  .btn.secondary{background:#eef5ff;color:#0d6efd;border-color:#cfe2ff}
-  .card{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
-  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .filters{display:flex;gap:8px;margin:10px 0;align-items:center;flex-wrap:wrap}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border:1px solid var(--border);text-align:center}
-  th{background:#f3f6fb}
-  .profit-positive{color:var(--pos);font-weight:700}
-  .profit-negative{color:var(--neg);font-weight:700}
-  .totals{background:#f1f1f1;font-weight:800}
-  .ranges .btn{background:#eef5ff;color:#0d6efd;border-color:#cfe2ff}
+:root {
+  --bg: #f9fafb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280;
+  --border: #e5e7eb; --primary: #2563eb; --primary-hover: #1d4ed8;
+  --danger: #ef4444; --danger-hover: #dc2626; --secondary: #f3f4f6;
+  --radius: 10px; --shadow: 0 2px 6px rgba(0,0,0,0.08);
+  --pos:#166534; --neg:#991b1b;
+}
+body{font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg);margin:0;color:var(--text);}
+.shell{max-width:1500px;margin:32px auto;padding:0 16px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+h2,h3{color:var(--primary);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:50px;border:none;font-size:16px;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.1s;text-decoration:none;}
+.btn:hover{transform:translateY(-1px);}
+.btn.link{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn.primary{background:var(--primary);color:#fff;}
+.btn.primary:hover{background:var(--primary-hover);}
+.btn.danger{background:var(--danger);color:#fff;}
+.btn.danger:hover{background:var(--danger-hover);}
+.btn.secondary{background:#eef2ff;color:var(--primary);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;}
+.filters{display:flex;gap:12px;margin:10px 0;align-items:center;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:18px;border-radius:var(--radius);overflow:hidden;}
+th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:center;}
+th{background:var(--secondary);font-weight:600;}
+tr:nth-child(even) td{background:#fdfdfd;}
+tr:hover td{background:#f1f5ff;}
+.totals{background:#f3f4f6;font-weight:700;}
+.profit-positive{color:var(--pos);font-weight:700}
+.profit-negative{color:var(--neg);font-weight:700}
+.ranges .btn{background:#eef2ff;color:var(--primary);}
 </style>
 <script>
-  function setRange(days){
-    const url = new URL(window.location.href);
-    url.searchParams.set('range', days);
-    if(days==='all'){ url.searchParams.delete('from'); url.searchParams.delete('to'); }
-    window.location.href = url.toString();
-  }
-
-  function openReceipt(data){
-    const w = window.open('', '_blank', 'width=720,height=900');
-    const html = `
+function setRange(days){
+  const url = new URL(window.location.href);
+  url.searchParams.set('range', days);
+  if(days==='all'){ url.searchParams.delete('from'); url.searchParams.delete('to'); }
+  window.location.href = url.toString();
+}
+function openReceipt(data){
+  const w = window.open('', '_blank', 'width=720,height=900');
+  const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,15 +124,13 @@ while($r=$res->fetch_assoc()){
     <div class="brand">HaulPro – ${data.truck}</div>
     <div class="meta">Receipt #: ${data.receipt}</div>
   </div>
-
   <div class="card">
     <h3>Truck</h3>
     <table>
-      <tr><th>Reg No</th><td>${data.truck}</td></tr>
+      <tr><th>Vehicle No</th><td>${data.truck}</td></tr>
       <tr><th>Driver</th><td>${data.driver_name} (${data.driver_phone})</td></tr>
     </table>
   </div>
-
   <div class="card">
     <h3>Trip</h3>
     <table>
@@ -124,7 +141,6 @@ while($r=$res->fetch_assoc()){
       <tr><th>Revenue</th><td>৳${data.revenue}</td></tr>
     </table>
   </div>
-
   <div class="card">
     <h3>Cost Breakdown</h3>
     <table>
@@ -138,22 +154,19 @@ while($r=$res->fetch_assoc()){
       <tr class="tot"><th>Profit</th><td>৳${data.profit}</td></tr>
     </table>
   </div>
-
-  <div class="actions">
-    <button class="btn" onclick="window.print()">Print</button>
-  </div>
+  <div class="actions"><button class="btn" onclick="window.print()">Print</button></div>
 </body>
 </html>`;
-    w.document.open(); w.document.write(html); w.document.close();
-  }
+  w.document.open(); w.document.write(html); w.document.close();
+}
 </script>
 </head>
 <body>
 <div class="shell">
   <div class="topbar">
-    <a class="btn link" href="lorrylist.php">⬅ Trucks</a>
-    <div><strong><?= htmlspecialchars($truck['reg_number']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?></div>
-    <a class="btn" href="calculationInput.php?truck_id=<?= (int)$truck_id ?>">+ New Trip</a>
+    <a class="btn link" href="lorrylist.php">⬅ Lorries</a>
+    <div><strong><?= htmlspecialchars($truck['vehicle_no']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?></div>
+    <a class="btn primary" href="calculationInput.php?truck_id=<?= (int)$truck_id ?>">+ New Trip</a>
   </div>
 
   <div class="card">
@@ -162,15 +175,15 @@ while($r=$res->fetch_assoc()){
         <input type="hidden" name="truck_id" value="<?= (int)$truck_id ?>">
         <label>From <input type="date" name="from" value="<?= htmlspecialchars($from) ?>"></label>
         <label>To <input type="date" name="to" value="<?= htmlspecialchars($to) ?>"></label>
-        <button class="btn" type="submit">Filter</button>
+        <button class="btn primary" type="submit">Filter</button>
         <a class="btn secondary" href="calculationShow.php?truck_id=<?= (int)$truck_id ?>">Reset</a>
       </form>
       <div class="ranges" style="margin-left:auto;display:flex;gap:6px">
-        <button class="btn" onclick="setRange(10)">10 days</button>
-        <button class="btn" onclick="setRange(30)">1 month</button>
-        <button class="btn" onclick="setRange(180)">6 months</button>
-        <button class="btn" onclick="setRange(365)">1 year</button>
-        <button class="btn" onclick="setRange('all')">All</button>
+        <button class="btn secondary" onclick="setRange(10)">10 days</button>
+        <button class="btn secondary" onclick="setRange(30)">1 month</button>
+        <button class="btn secondary" onclick="setRange(180)">6 months</button>
+        <button class="btn secondary" onclick="setRange(365)">1 year</button>
+        <button class="btn secondary" onclick="setRange('all')">All</button>
       </div>
     </div>
 
@@ -216,7 +229,7 @@ while($r=$res->fetch_assoc()){
                 class="btn secondary"
                 onclick='openReceipt({
                   receipt: <?= json_encode($receipt) ?>,
-                  truck:   <?= json_encode($truck["reg_number"]) ?>,
+                  truck:   <?= json_encode($truck["vehicle_no"]) ?>,
                   date:    <?= json_encode($dateBD) ?>,
                   route:   <?= json_encode($route) ?>,
                   type:    <?= json_encode($r["trip_type"]) ?>,

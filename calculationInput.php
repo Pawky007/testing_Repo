@@ -15,9 +15,12 @@ function calculateDistance($from,$to){
 $truck_id = isset($_GET['truck_id']) ? (int)$_GET['truck_id'] : 0;
 if ($truck_id<=0) die('Missing truck_id');
 
-$st = $mysqli->prepare("SELECT t.id, t.reg_number, t.truck_type, t.current_location, t.driver_id,
+$st = $mysqli->prepare("SELECT l.id, l.vehicle_no, l.truck_type, l.driver_id,
                                d.name AS driver_name, d.phone AS driver_phone
-                        FROM trucks t LEFT JOIN drivers d ON d.id=t.driver_id WHERE t.id=?");
+                        FROM lorry_owners l 
+                        LEFT JOIN drivers d ON d.id=l.driver_id 
+                        WHERE l.id=?");
+
 $st->bind_param('i',$truck_id);
 $st->execute();
 $truck = $st->get_result()->fetch_assoc();
@@ -74,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       }
 
       // attach driver to truck (optional but handy)
-      $att = $mysqli->prepare("UPDATE trucks SET driver_id=? WHERE id=?");
+      $att = $mysqli->prepare("UPDATE lorry_owners SET driver_id=? WHERE id=?");
       $att->bind_param('ii',$driver_id,$truck_id);
       $att->execute();
 
@@ -127,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Trip Input — <?= htmlspecialchars($truck['reg_number']) ?></title>
+  <title>Trip Input — <?= htmlspecialchars($truck['vehicle_no']) ?></title>
   <style>
     :root{--bg:#f6f8fb;--surface:#fff;--text:#111;--border:#e3e6eb;--btn:#0d6efd;--btn-text:#fff;--pill:#eef5ff;--pill-text:#0d6efd}
     *{box-sizing:border-box}
@@ -159,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   <div class="topbar">
     <div class="left">
       <a class="btn link" href="lorrylist.php">⬅ Back</a>
-      <strong><?= htmlspecialchars($truck['reg_number']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?>
+      <strong><?= htmlspecialchars($truck['vehicle_no']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?>
     </div>
     <a class="btn secondary" href="calculationShow.php?truck_id=<?= (int)$truck_id ?>">📄 View Trips</a>
   </div>
