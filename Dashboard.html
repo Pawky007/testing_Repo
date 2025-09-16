@@ -15,9 +15,28 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
+    <style>
+      #map {
+        width: 100%;
+        height: 600px;
+        border: 0;
+      }
+      .traffic-toggle {
+        margin: 10px 0;
+        padding: 8px 15px;
+        border: none;
+        background: #007bff;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .traffic-toggle:hover {
+        background: #0056b3;
+      }
+    </style>
   </head>
   <body>
-    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     <div class="container">
       <aside class="sidebar" id="sidebar">
         <img src="Image/Logo.png" alt="HaulPro Logo" width="160" />
@@ -27,32 +46,59 @@
             <a href="#"><img src="Image/dashboard.png" alt="" />Dashboard</a>
           </li>
           <li>
-            <a href="#"><img src="Image/chart.png" alt="" />Analytics</a>
+            <a href="#"
+              ><img
+                src="Image/chart.png"
+                alt=""
+                style="width: 40px"
+              />Analytics</a
+            >
           </li>
           <li>
-            <a href="#"><img src="Image/car.png" alt="" />Vehicle</a>
+            <a href="#"
+              ><img src="Image/car.png" alt="" style="width: 40px" />Vehicle</a
+            >
           </li>
           <li>
-            <a href="#"><img src="Image/plus.png" alt="" />Add Trips</a>
+            <a href="#"
+              ><img src="Image/plus.png" alt="" style="width: 40px" />Add
+              Trips</a
+            >
           </li>
           <li>
-            <a href="#"><img src="Image/wallet.png" alt="" />Payment Method</a>
+            <a href="#"
+              ><img src="Image/wallet.png" alt="" style="width: 40px" />Payment
+              Method</a
+            >
           </li>
           <li>
             <a href="Lorry_owner.php"
-              ><img src="Image/businessman.png" alt="" />Lorry Owner List</a
+              ><img
+                src="Image/businessman.png"
+                alt=""
+                style="width: 40px"
+              />Lorry Owner List</a
             >
           </li>
           <li>
             <a href="lorrylist.php"
-              ><img src="Image/truck.png" alt="" />Lorry List</a
+              ><img src="Image/truck.png" alt="" style="width: 40px" />Lorry
+              List</a
             >
           </li>
           <li>
-            <a href="#"><img src="Image/settings.png" alt="" />Settings</a>
+            <a href="#"
+              ><img
+                src="Image/settings.png"
+                alt=""
+                style="width: 40px"
+              />Settings</a
+            >
           </li>
           <li>
-            <a href="#"><img src="Image/faq.png" alt="" />FAQ</a>
+            <a href="#"
+              ><img src="Image/faq.png" alt="" style="width: 40px" />FAQ</a
+            >
           </li>
         </ul>
         <div class="help-card">
@@ -128,25 +174,10 @@
         <div class="main-content">
           <div class="map-container">
             <h3 class="map-heading">Live GPS Tracking</h3>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3649.9008600456577!2d90.42483137604525!3d23.822124178621525!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c711d13bbec7%3A0xc47f7c3e8e2263f2!2sAmerican%20International%20University%20-%20Bangladesh%20(AIUB)!5e0!3m2!1sen!2sbd!4v1757267155206!5m2!1sen!2sbd"
-              width="100%"
-              height="600"
-              style="border: 0"
-              allowfullscreen=""
-              loading="lazy"
-            ></iframe>
-          </div>
-
-          <div class="notification-container">
-            <div class="notification">
-              <h3>Recent Notifications</h3>
-              <ul>
-                <li>New payment request: $500.00</li>
-                <li>Load order #12345 has been completed</li>
-                <li>New vehicle added: <b>Dhaka Metro-CHA 11-121314</b></li>
-              </ul>
-            </div>
+            <button class="traffic-toggle" onclick="toggleTraffic()">
+              Toggle Traffic Layer
+            </button>
+            <div id="map"></div>
           </div>
         </div>
       </main>
@@ -162,10 +193,145 @@
     </footer>
 
     <script>
-      function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("active");
-        document.getElementById("dashboard").classList.toggle("shifted");
+      let map,
+        directionsService,
+        trafficLayer,
+        trafficVisible = true;
+      let myLocation = null;
+      let activeRenderer = null; // Only one route at a time
+      let activeVehicle = null; // Track active vehicle
+
+      function initMap() {
+        const defaultLocation = { lat: 23.8103, lng: 90.4125 }; // Dhaka fallback
+
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: defaultLocation,
+        });
+
+        directionsService = new google.maps.DirectionsService();
+
+        // Initialize traffic layer
+        trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              myLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+
+              new google.maps.Marker({
+                position: myLocation,
+                map: map,
+                title: "You (Position A)",
+                icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+              });
+
+              map.setCenter(myLocation);
+
+              // Example 6 vehicles in Dhaka
+              const vehicles = [
+                { id: "V1", position: { lat: 23.8201, lng: 90.4152 } },
+                { id: "V2", position: { lat: 23.7955, lng: 90.3537 } },
+                { id: "V3", position: { lat: 23.8324, lng: 90.4228 } },
+                { id: "V4", position: { lat: 23.8124, lng: 90.428 } },
+                { id: "V5", position: { lat: 23.805, lng: 90.39 } },
+                { id: "V6", position: { lat: 23.8255, lng: 90.4005 } },
+              ];
+
+              addVehicleMarkers(vehicles);
+            },
+            () => {
+              alert("Geolocation failed. Using default center.");
+            }
+          );
+        }
+      }
+
+      function addVehicleMarkers(vehicles) {
+        vehicles.forEach((vehicle) => {
+          const marker = new google.maps.Marker({
+            position: vehicle.position,
+            map: map,
+            title: vehicle.id,
+            icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+          });
+
+          // Toggle route on marker click
+          marker.addListener("click", () => {
+            toggleRoute(vehicle.id, vehicle.position);
+          });
+        });
+      }
+
+      function toggleRoute(vehicleId, vehiclePos) {
+        if (!myLocation) {
+          alert("Your location is not available yet.");
+          return;
+        }
+
+        if (activeVehicle === vehicleId) {
+          // Same vehicle clicked again → remove route
+          if (activeRenderer) {
+            activeRenderer.setMap(null);
+            activeRenderer = null;
+            activeVehicle = null;
+          }
+        } else {
+          // Clear existing route
+          if (activeRenderer) {
+            activeRenderer.setMap(null);
+          }
+
+          // Draw new bold purple route
+          const directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: false,
+            polylineOptions: {
+              strokeColor: "#800080", // Purple
+              strokeOpacity: 1.0,
+              strokeWeight: 7,
+            },
+          });
+
+          directionsService.route(
+            {
+              origin: myLocation,
+              destination: vehiclePos,
+              travelMode: google.maps.TravelMode.DRIVING,
+            },
+            (response, status) => {
+              if (status === "OK") {
+                directionsRenderer.setDirections(response);
+                activeRenderer = directionsRenderer;
+                activeVehicle = vehicleId;
+              } else {
+                alert("Directions request failed due to " + status);
+              }
+            }
+          );
+        }
+      }
+
+      // Toggle traffic layer
+      function toggleTraffic() {
+        if (trafficVisible) {
+          trafficLayer.setMap(null);
+        } else {
+          trafficLayer.setMap(map);
+        }
+        trafficVisible = !trafficVisible;
       }
     </script>
+
+    <!-- Load Google Maps JS API -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9OwltS3fiIj-fEbmKAPcYH39lj-mOZmM&callback=initMap"
+      async
+      defer
+    ></script>
   </body>
 </html>
