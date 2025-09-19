@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="dashboad_style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="analysis_css.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
@@ -42,18 +43,37 @@
         <img src="Image/Logo.png" alt="HaulPro Logo" width="160" />
         <h3>HaulPro</h3>
         <ul class="menu">
-          <li class="active">
-            <a href="#"><img src="Image/dashboard.png" alt="" />Dashboard</a>
-          </li>
           <li>
-            <a href="#"
-              ><img
-                src="Image/chart.png"
-                alt=""
-                style="width: 40px"
-              />Analytics</a
-            >
+            <a href="dashboard.html">
+              <img src="Image/dashboard.png" alt="" />Dashboard
+            </a>
           </li>
+
+          <!-- Analysis dropdown (hover to expand, no arrow) -->
+          <li class="has-submenu">
+            <a href="#"> <img src="Image/chart.png" alt="" />Analysis </a>
+            <ul class="submenu">
+              <li>
+                <a href="delivery_performance.php"
+                  ><img src="Image/continuous-improvement.png" alt="" />Delivery
+                  Performance</a
+                >
+              </li>
+              <li>
+                <a href="revenue_analysis.html"
+                  ><img src="Image/profit-margin.png" alt="" />Revenue
+                  Analysis</a
+                >
+              </li>
+              <li>
+                <a href="fleet_efficiency.html"
+                  ><img src="Image/delivery-truck.png" alt="" />Fleet
+                  Efficiency</a
+                >
+              </li>
+            </ul>
+          </li>
+
           <li>
             <a href="#"
               ><img src="Image/car.png" alt="" style="width: 40px" />Vehicle</a
@@ -96,11 +116,12 @@
             >
           </li>
           <li>
-            <a href="#"
+            <a href="faq.html"
               ><img src="Image/faq.png" alt="" style="width: 40px" />FAQ</a
             >
           </li>
         </ul>
+
         <div class="help-card">
           <img
             src="https://cdn-icons-png.flaticon.com/512/4712/4712002.png"
@@ -173,10 +194,15 @@
 
         <div class="main-content">
           <div class="map-container">
-            <h3 class="map-heading">Live GPS Tracking</h3>
-            <button class="traffic-toggle" onclick="toggleTraffic()">
-              Toggle Traffic Layer
-            </button>
+            <h3 class="map-heading" style="display: flex; align-items: center">
+              <button
+                class="traffic-toggle"
+                onclick="toggleTraffic()"
+                style="margin-right: 500px"
+              >
+                Toggle Traffic Layer</button
+              >Live GPS Tracking
+            </h3>
             <div id="map"></div>
           </div>
         </div>
@@ -201,6 +227,11 @@
       let activeRenderer = null; // Only one route at a time
       let activeVehicle = null; // Track active vehicle
 
+      // Random offset generator (~500m)
+      function randomOffset(range = 0.005) {
+        return (Math.random() - 0.5) * range * 2;
+      }
+
       function initMap() {
         const defaultLocation = { lat: 23.8103, lng: 90.4125 }; // Dhaka fallback
 
@@ -210,42 +241,45 @@
         });
 
         directionsService = new google.maps.DirectionsService();
-
-        // Initialize traffic layer
         trafficLayer = new google.maps.TrafficLayer();
         trafficLayer.setMap(map);
 
+        // --- Show vehicles immediately ---
+        const baseVehicles = [
+          { id: "V1", lat: 23.8201, lng: 90.4152 },
+          { id: "V2", lat: 23.7955, lng: 90.3537 },
+          { id: "V3", lat: 23.8324, lng: 90.4228 },
+          { id: "V4", lat: 23.8124, lng: 90.428 },
+          { id: "V5", lat: 23.805, lng: 90.39 },
+          { id: "V6", lat: 23.8255, lng: 90.4005 },
+        ];
+        const vehicles = baseVehicles.map((v) => ({
+          id: v.id,
+          position: {
+            lat: v.lat + randomOffset(),
+            lng: v.lng + randomOffset(),
+          },
+        }));
+        addVehicleMarkers(vehicles);
+
+        // --- Get user location later ---
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            (position) => {
+            (pos) => {
               myLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
               };
-
               new google.maps.Marker({
                 position: myLocation,
                 map: map,
                 title: "You (Position A)",
                 icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
               });
-
               map.setCenter(myLocation);
-
-              // Example 6 vehicles in Dhaka
-              const vehicles = [
-                { id: "V1", position: { lat: 23.8201, lng: 90.4152 } },
-                { id: "V2", position: { lat: 23.7955, lng: 90.3537 } },
-                { id: "V3", position: { lat: 23.8324, lng: 90.4228 } },
-                { id: "V4", position: { lat: 23.8124, lng: 90.428 } },
-                { id: "V5", position: { lat: 23.805, lng: 90.39 } },
-                { id: "V6", position: { lat: 23.8255, lng: 90.4005 } },
-              ];
-
-              addVehicleMarkers(vehicles);
             },
             () => {
-              alert("Geolocation failed. Using default center.");
+              console.warn("Geolocation failed. Vehicles still showing.");
             }
           );
         }
