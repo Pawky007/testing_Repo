@@ -3,12 +3,82 @@ require __DIR__.'/db.php';
 
 $locations = ["Dhaka","Chattogram","Cumilla"];
 
-function calculateDistance($from,$to){
-  $dist=[
-    "Dhaka"=>["Chattogram"=>253,"Cumilla"=>109],
-    "Chattogram"=>["Dhaka"=>253,"Cumilla"=>152],
-    "Cumilla"=>["Dhaka"=>109,"Chattogram"=>152]
+function calculateDistance($from, $to) {
+  $dist = [
+    "Dhaka" => [
+      "Chattogram" => 253,
+      "Cumilla"     => 109,
+      "Sylhet"      => 241,
+      "Rajshahi"    => 256,
+      "Khulna"      => 271,
+      "Barisal"     => 169,
+      "Rangpur"     => 330
+    ],
+    "Chattogram" => [
+      "Dhaka"     => 253,
+      "Cumilla"   => 152,
+      "Sylhet"    => 359,
+      "Rajshahi"  => 560,
+      "Khulna"    => 464,
+      "Barisal"   => 380,
+      "Rangpur"   => 640
+    ],
+    "Cumilla" => [
+      "Dhaka"     => 109,
+      "Chattogram"=> 152,
+      "Sylhet"    => 270,
+      "Rajshahi"  => 365,
+      "Khulna"    => 362,
+      "Barisal"   => 260,
+      "Rangpur"   => 450
+    ],
+    "Sylhet" => [
+      "Dhaka"     => 241,
+      "Chattogram"=> 359,
+      "Cumilla"   => 270,
+      "Rajshahi"  => 482,
+      "Khulna"    => 500,
+      "Barisal"   => 410,
+      "Rangpur"   => 450
+    ],
+    "Rajshahi" => [
+      "Dhaka"     => 256,
+      "Chattogram"=> 560,
+      "Cumilla"   => 365,
+      "Sylhet"    => 482,
+      "Khulna"    => 264,
+      "Barisal"   => 340,
+      "Rangpur"   => 185
+    ],
+    "Khulna" => [
+      "Dhaka"     => 271,
+      "Chattogram"=> 464,
+      "Cumilla"   => 362,
+      "Sylhet"    => 500,
+      "Rajshahi"  => 264,
+      "Barisal"   => 160,
+      "Rangpur"   => 460
+    ],
+    "Barisal" => [
+      "Dhaka"     => 169,
+      "Chattogram"=> 380,
+      "Cumilla"   => 260,
+      "Sylhet"    => 410,
+      "Rajshahi"  => 340,
+      "Khulna"    => 160,
+      "Rangpur"   => 480
+    ],
+    "Rangpur" => [
+      "Dhaka"     => 330,
+      "Chattogram"=> 640,
+      "Cumilla"   => 450,
+      "Sylhet"    => 450,
+      "Rajshahi"  => 185,
+      "Khulna"    => 460,
+      "Barisal"   => 480
+    ]
   ];
+
   return $dist[$from][$to] ?? 0;
 }
 
@@ -130,157 +200,272 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Trip Input — <?= htmlspecialchars($truck['vehicle_no']) ?></title>
+  <title>Add Trip — <?= htmlspecialchars($truck['vehicle_no']) ?></title>
+  <link rel="stylesheet" href="dashboad_style.css">
   <style>
-    :root{--bg:#f6f8fb;--surface:#fff;--text:#111;--border:#e3e6eb;--btn:#0d6efd;--btn-text:#fff;--pill:#eef5ff;--pill-text:#0d6efd}
-    *{box-sizing:border-box}
-    body{font-family:system-ui,Segoe UI,Arial;background:var(--bg);margin:0;color:var(--text)}
-    .shell{max-width:1500px;margin:20px auto;padding:0 12px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .btn{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--btn);color:var(--btn-text);text-decoration:none;cursor:pointer}
-    .btn.link{background:transparent;color:#333}
-    .btn.secondary{background:var(--pill);color:var(--pill-text);border-color:#cfe2ff}
-    .card{border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--surface)}
-    h2{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+    :root {
+      --primary:#2563eb;
+      --primary-hover:#1d4ed8;
+      --bg:#f3f6fb;
+      --surface:#fff;
+      --border:#e5e7eb;
+      --text:#111827;
+      --muted:#6b7280;
+      --radius:12px;
+      --shadow:0 6px 16px rgba(0,0,0,0.08);
+      --success:#16a34a;
+      --danger:#dc2626;
+    }
+    body {
+      margin:0;
+      font-family:'Segoe UI',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .container { display:flex; }
+    main { flex:1; padding:32px; }
 
-    label{display:block;margin:6px 0 4px;font-size:12px}
-    input,select{width:100%;padding:8px;font-size:14px;border:1px solid var(--border);border-radius:10px;min-width:0;background:#fff}
-    .row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-    .distance{padding:8px;font-size:14px;border:1px dashed #ccd;border-radius:10px;background:#fafbff}
-    .error{background:#ffe8ea;color:#a10016;padding:10px;border-radius:10px;margin-bottom:10px;border:1px solid #ffd1d8}
+    /* Header */
+    .header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:24px;
+    }
+    .header h1 {
+      margin:0;
+      font-size:24px;
+      font-weight:700;
+      color:var(--primary);
+    }
+    .header .meta {
+      font-size:14px;
+      color:var(--muted);
+      background:#eef2ff;
+      padding:6px 12px;
+      border-radius:var(--radius);
+    }
 
-    .two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px;row-gap:16px;position:relative;margin-top:12px}
-    .two-col::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);pointer-events:none}
-    .col{display:grid;grid-template-columns:1fr;gap:12px}
-    .actions{display:flex;gap:10px;align-items:center;margin-top:14px}
-    @media (max-width:800px){.two-col{grid-template-columns:1fr}.two-col::after{display:none}.row2{grid-template-columns:1fr}}
+    /* Card */
+    .card {
+      background:var(--surface);
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      padding:28px;
+      animation: fadeIn .4s ease;
+    }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+    /* Form */
+    form label {
+      display:block;
+      font-weight:600;
+      margin-bottom:6px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    form input, form select {
+      width:100%;
+      padding:12px 14px;
+      font-size:14px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      margin-bottom:18px;
+      transition:border .2s, box-shadow .2s, transform .1s;
+    }
+    form input:focus, form select:focus {
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+      transform:scale(1.01);
+    }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    @media(max-width:800px){ .row2{grid-template-columns:1fr;} }
+
+    /* Metrics */
+    .metrics {
+      background:#f9fafb;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px 18px;
+      font-weight:700;
+      font-size:15px;
+      margin-bottom:16px;
+      transition:.3s;
+    }
+    #profit.positive { background:#ecfdf5; color:var(--success); border-color:#bbf7d0; }
+    #profit.negative { background:#fef2f2; color:var(--danger); border-color:#fecaca; }
+
+    /* Button */
+    .btn {
+      background:var(--primary);
+      color:#fff;
+      padding:12px 22px;
+      border:none;
+      border-radius:var(--radius);
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.25s;
+      box-shadow:0 3px 6px rgba(0,0,0,0.1);
+    }
+    .btn:hover { background:var(--primary-hover); transform:translateY(-1px);}
+    .btn:active { transform:translateY(1px); }
+
+    /* Error */
+    .error {
+      background:#fee2e2;
+      border:1px solid #fecaca;
+      color:#991b1b;
+      padding:12px;
+      border-radius:var(--radius);
+      margin-bottom:16px;
+      font-weight:500;
+    }
   </style>
 </head>
 <body>
-<div class="shell">
-  <div class="topbar">
-    <div class="left">
-      <a class="btn link" href="lorrylist.php">⬅ Back</a>
-      <strong><?= htmlspecialchars($truck['vehicle_no']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?>
+<div class="container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <img src="Image/Logo.png" alt="HaulPro Logo" width="160"/>
+    <h3>HaulPro</h3>
+    <ul class="menu">
+      <li><a href="dashboard.html"><img src="Image/dashboard.png" alt=""/>Dashboard</a></li>
+      <li class="has-submenu">
+        <a href="#"><img src="Image/chart.png" alt=""/>Analysis</a>
+        <ul class="submenu">
+          <li><a href="delivery_performance.php"><img src="Image/continuous-improvement.png" alt=""/>Delivery Performance</a></li>
+          <li><a href="revenue_analysis.html"><img src="Image/profit-margin.png" alt=""/>Revenue Analysis</a></li>
+          <li><a href="fleet_efficiency.html"><img src="Image/delivery-truck.png" alt=""/>Fleet Efficiency</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><img src="Image/car.png" alt=""/>Vehicle</a></li>
+      <li><a href="#"><img src="Image/plus.png" alt=""/>Add Trips</a></li>
+      <li><a href="#"><img src="Image/wallet.png" alt=""/>Payment Method</a></li>
+      <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt=""/>Lorry Owner List</a></li>
+      <li><a href="lorrylist.php"><img src="Image/truck.png" alt=""/>Lorry List</a></li>
+      <li><a href="#"><img src="Image/settings.png" alt=""/>Settings</a></li>
+      <li><a href="faq.html"><img src="Image/faq.png" alt=""/>FAQ</a></li>
+    </ul>
+    <div class="help-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712002.png" alt="Help"/>
+      <p>Need Help?</p>
+      <button>Contact Now</button>
     </div>
-    <a class="btn secondary" href="calculationShow.php?truck_id=<?= (int)$truck_id ?>">📄 View Trips</a>
-  </div>
+  </aside>
 
-  <div class="card">
-    <h2>🛻 Trip Details</h2>
-    <?php if ($errorMessage): ?><div class="error"><?= htmlspecialchars($errorMessage) ?></div><?php endif; ?>
-
-    <!-- IMPORTANT: keep truck_id in the action so POST never loses it -->
-    <form method="POST" action="calculationInput.php?truck_id=<?= (int)$truck_id ?>" autocomplete="off">
-      <div class="row2">
-        <div>
-          <label>Trip Date</label>
-          <input type="date" name="tripDate" value="<?= htmlspecialchars($_POST['tripDate'] ?? date('Y-m-d')) ?>">
-        </div>
-        <div>
-          <label>Trip Type</label>
-          <select name="tripType">
-            <option value="Single">Single</option>
-            <option value="Round">Round</option>
-          </select>
-        </div>
+  <!-- Main -->
+  <main>
+    <div class="header">
+      <h1>➕ Add Trip</h1>
+      <div class="meta">
+        Truck: <strong><?= htmlspecialchars($truck['vehicle_no']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?>
       </div>
+    </div>
 
-      <div class="row2">
-        <div>
-          <label>From</label>
-          <select id="routeFrom" name="routeFrom" required onchange="updateDistance()">
-            <option value="">Select From</option>
-            <?php foreach($locations as $l): ?>
-              <option<?= isset($_POST['routeFrom']) && $_POST['routeFrom']===$l?' selected':''; ?>><?= htmlspecialchars($l) ?></option>
-            <?php endforeach; ?>
-          </select>
+    <div class="card">
+      <?php if ($errorMessage): ?><div class="error"><?= htmlspecialchars($errorMessage) ?></div><?php endif; ?>
+
+      <form method="POST" action="calculationInput.php?truck_id=<?= (int)$truck_id ?>">
+        <div class="row2">
+          <div>
+            <label>Trip Date</label>
+            <input type="date" name="tripDate" value="<?= htmlspecialchars($_POST['tripDate'] ?? date('Y-m-d')) ?>">
+          </div>
+          <div>
+            <label>Trip Type</label>
+            <select name="tripType">
+              <option value="Single">Single</option>
+              <option value="Round">Round</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label>To</label>
-          <select id="routeTo" name="routeTo" required onchange="updateDistance()">
-            <option value="">Select To</option>
-            <?php foreach($locations as $l): ?>
-              <option<?= isset($_POST['routeTo']) && $_POST['routeTo']===$l?' selected':''; ?>><?= htmlspecialchars($l) ?></option>
-            <?php endforeach; ?>
-          </select>
+
+        <div class="row2">
+          <div>
+            <label>From</label>
+            <select id="routeFrom" name="routeFrom" onchange="updateDistance()">
+              <option value="">Select From</option>
+              <?php foreach($locations as $l): ?>
+                <option><?= htmlspecialchars($l) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div>
+            <label>To</label>
+            <select id="routeTo" name="routeTo" onchange="updateDistance()">
+              <option value="">Select To</option>
+              <?php foreach($locations as $l): ?>
+                <option><?= htmlspecialchars($l) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <label>Distance (km)</label>
-      <div id="distanceDisplay" class="distance">Select both locations to see distance</div>
+        <div class="metrics" id="distanceDisplay">Select both locations to see distance</div>
 
-      <div class="two-col">
-        <div class="col">
+        <div class="row2">
           <div>
             <label>Revenue (BDT)</label>
-            <input type="number" id="revenue" name="revenue" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['revenue'] ?? '') ?>">
+            <input type="number" id="revenue" name="revenue" min="0" step="0.01">
           </div>
-
-          <div class="row2">
-            <div>
-              <label>Driver's Name</label>
-              <input type="text" id="driverName" name="driverName" value="<?= htmlspecialchars($driverName) ?>" required>
-            </div>
-            <div>
-              <label>Driver's Number</label>
-              <input type="text" id="driverNumber" name="driverNumber" value="<?= htmlspecialchars($driverNumber) ?>" required>
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label>Driver Fee (BDT)</label>
-              <input type="number" id="driverFee" name="driverFee" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['driverFee'] ?? '') ?>">
-            </div>
-            <div>
-              <label>Fuel Cost (BDT)</label>
-              <input type="number" id="fuelCost" name="fuelCost" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['fuelCost'] ?? '') ?>">
-            </div>
-          </div>
-
           <div>
-            <label>Total Cost (BDT)</label>
-            <div id="totalCost" class="distance" style="border-style:solid">0.00</div>
+            <label>Driver Fee (BDT)</label>
+            <input type="number" id="driverFee" name="driverFee" min="0" step="0.01">
           </div>
         </div>
 
-        <div class="col">
-          <div class="row2">
-            <div>
-              <label>Toll Cost (BDT)</label>
-              <input type="number" id="tollCost" name="tollCost" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['tollCost'] ?? '') ?>">
-            </div>
-            <div>
-              <label>Labor Cost (BDT)</label>
-              <input type="number" id="laborCost" name="laborCost" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['laborCost'] ?? '') ?>">
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label>Gate Cost (BDT)</label>
-              <input type="number" id="gateCost" name="gateCost" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['gateCost'] ?? '') ?>">
-            </div>
-            <div>
-              <label>Others (BDT)</label>
-              <input type="number" id="miscCost" name="miscCost" min="0" step="0.01" required value="<?= htmlspecialchars($_POST['miscCost'] ?? '') ?>">
-            </div>
-          </div>
-
+        <div class="row2">
           <div>
-            <label>Profit (BDT)</label>
-            <div id="profit" class="distance" style="border-style:solid">0.00</div>
+            <label>Fuel Cost (BDT)</label>
+            <input type="number" id="fuelCost" name="fuelCost" min="0" step="0.01">
+          </div>
+          <div>
+            <label>Toll Cost (BDT)</label>
+            <input type="number" id="tollCost" name="tollCost" min="0" step="0.01">
           </div>
         </div>
-      </div>
 
-      <div class="actions">
+        <div class="row2">
+          <div>
+            <label>Labor Cost (BDT)</label>
+            <input type="number" id="laborCost" name="laborCost" min="0" step="0.01">
+          </div>
+          <div>
+            <label>Gate Cost (BDT)</label>
+            <input type="number" id="gateCost" name="gateCost" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>Other Cost (BDT)</label>
+            <input type="number" id="miscCost" name="miscCost" min="0" step="0.01">
+          </div>
+          <div>
+            <label>Driver Name</label>
+            <input type="text" id="driverName" name="driverName" value="<?= htmlspecialchars($driverName) ?>">
+          </div>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>Driver Number</label>
+            <input type="text" id="driverNumber" name="driverNumber" value="<?= htmlspecialchars($driverNumber) ?>">
+          </div>
+          <div></div>
+        </div>
+
+        <div class="metrics" id="totalCost">Total Cost: 0.00</div>
+        <div class="metrics" id="profit">Profit: 0.00</div>
+
         <button class="btn" type="submit">💾 Save Trip</button>
-      </div>
-    </form>
-  </div>
+      </form>
+    </div>
+  </main>
 </div>
 
 <script>
@@ -289,8 +474,8 @@ function updateDistance(){
   var t=document.getElementById('routeTo').value;
   var el=document.getElementById('distanceDisplay');
   const map={"Dhaka":{"Chattogram":253,"Cumilla":109},"Chattogram":{"Dhaka":253,"Cumilla":152},"Cumilla":{"Dhaka":109,"Chattogram":152}};
-  if(f && t && f!==t && map[f] && map[f][t]) el.textContent = map[f][t];
-  else el.textContent='Select both locations to see distance';
+  if(f && t && f!==t && map[f] && map[f][t]) el.textContent="Distance: "+map[f][t]+" km";
+  else el.textContent="Select both locations to see distance";
 }
 ['driverFee','fuelCost','tollCost','laborCost','gateCost','miscCost','revenue'].forEach(id=>{
   document.getElementById(id).addEventListener('input',calc);
@@ -304,8 +489,8 @@ function calc(){
   let ot=+document.getElementById('miscCost').value||0;
   let rv=+document.getElementById('revenue').value||0;
   let tc=df+fu+to+la+ga+ot;
-  document.getElementById('totalCost').textContent=tc.toFixed(2);
-  document.getElementById('profit').textContent=(rv-tc).toFixed(2);
+  document.getElementById('totalCost').textContent="Total Cost: "+tc.toFixed(2);
+  document.getElementById('profit').textContent="Profit: "+(rv-tc).toFixed(2);
 }
 </script>
 </body>

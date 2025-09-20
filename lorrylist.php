@@ -56,6 +56,7 @@ $res = $mysqli->query("SELECT id, vehicle_no, truck_type, status FROM lorry_owne
 <head>
 <meta charset="UTF-8">
 <title>HaulPro — Lorry List</title>
+<link rel="stylesheet" href="dashboad_style.css">
 <style>
 :root {
   --bg: #f9fafb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280;
@@ -64,7 +65,8 @@ $res = $mysqli->query("SELECT id, vehicle_no, truck_type, status FROM lorry_owne
   --radius: 10px; --shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);margin:0;color:var(--text);}
-.shell{max-width:1500px;margin:32px auto;padding:0 16px;}
+.container{display:flex;}
+.shell{flex:1;max-width:1700px;margin:32px auto;padding:0 16px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
 h2{font-size:1.7rem;font-weight:700;text-align:center;flex-grow:1;color:var(--primary);}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:50px;border:none;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.1s;text-decoration:none;}
@@ -76,13 +78,6 @@ h2{font-size:1.7rem;font-weight:700;text-align:center;flex-grow:1;color:var(--pr
 .btn.danger:hover{background:var(--danger-hover);}
 .btn.secondary{background:#eef2ff;color:var(--primary);}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;}
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; } 
-.grid input { width: 450px; }
-label{font-size:14px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;}
-input,select{width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;outline:none;}
-input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,0.15);}
-.form-actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;}
-.msg{margin:16px 0;padding:12px 16px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;border-radius:var(--radius);font-size:14px;}
 table{width:100%;border-collapse:collapse;font-size:16px;border-radius:var(--radius);overflow:hidden;}
 th,td{padding:14px 16px;border-bottom:1px solid var(--border);}
 th{background:var(--secondary);font-weight:600;text-align:left;}
@@ -110,105 +105,94 @@ function stopEvt(e){ e.stopPropagation(); }
 </script>
 </head>
 <body>
-<div class="shell">
-  <div class="topbar">
-    <a class="btn link" href="Dashboard.html">⬅ Back to Dashboard</a>
-    <h2>🚛 Lorry List</h2>
-    <span></span>
-  </div>
+<div class="container">
 
-  <?php if($msg): ?><div class="msg"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+  <!-- Sidebar (from dashboard) -->
+  <aside class="sidebar" id="sidebar">
+    <img src="Image/Logo.png" alt="HaulPro Logo" width="160" />
+    <h3>HaulPro</h3>
+    <ul class="menu">
+      <li><a href="dashboard.html"><img src="Image/dashboard.png" alt="" />Dashboard</a></li>
+      <li class="has-submenu">
+        <a href="#"><img src="Image/chart.png" alt="" />Analysis</a>
+        <ul class="submenu">
+          <li><a href="delivery_performance.php"><img src="Image/continuous-improvement.png" alt="" />Delivery Performance</a></li>
+          <li><a href="Revenue_analysis.php"><img src="Image/profit-margin.png" alt="" />Revenue Analysis</a></li>
+          <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><img src="Image/car.png" alt="" style="width:40px" />Vehicle</a></li>
+      <li><a href="#"><img src="Image/plus.png" alt="" style="width:40px" />Add Trips</a></li>
+      <li><a href="#"><img src="Image/wallet.png" alt="" style="width:40px" />Payment Method</a></li>
+      <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt="" style="width:40px" />Lorry Owner List</a></li>
+      <li><a href="lorrylist.php"><img src="Image/truck.png" alt="" style="width:40px" />Lorry List</a></li>
+      <li><a href="#"><img src="Image/settings.png" alt="" style="width:40px" />Settings</a></li>
+      <li><a href="faq.html"><img src="Image/faq.png" alt="" style="width:40px" />FAQ</a></li>
+    </ul>
+    <div class="help-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712002.png" alt="Help"/>
+      <p>Need Help?</p>
+      <button>Contact Now</button>
+    </div>
+  </aside>
 
-  <!--<div class="card" style="margin-bottom:16px">
-    <h3><?= $edit_truck ? '✏️ Edit Lorry' : '➕ Add Lorry' ?></h3>
-    <form method="post">
-      <div class="grid">
-        <div>
-          <label>Vehicle No</label>
-          <input type="text" name="vehicle_no" required value="<?= htmlspecialchars($edit_truck['vehicle_no'] ?? '') ?>">
-        </div>
-        <div>
-          <label>Truck Type</label>
-          <select name="truck_type" required>
-            <?php
-              $opts=['Small Truck','Medium Truck','Large Truck','Covered Van','Open Truck'];
-              $cur=$edit_truck['truck_type'] ?? '';
-              foreach($opts as $o){ $sel=($o===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($o)."</option>"; }
-            ?>
-          </select>
-        </div>
-        <div>
-          <label>Status</label>
-          <select name="status">
-            <?php
-              $sopts=['Available','Active','In Transit','Delivered','Waiting for Load','Out of Service','Maintenance'];
-              $scur=$edit_truck['status'] ?? 'Available';
-              foreach($sopts as $s){ $sel=($s===$scur)?'selected':''; echo "<option $sel>".htmlspecialchars($s)."</option>"; }
-            ?>
-          </select>
-        </div>
-      </div>
-      <div class="form-actions">
-        <?php if($edit_truck): ?>
-          <input type="hidden" name="id" value="<?= (int)$edit_truck['id'] ?>">
-          <input type="hidden" name="action" value="update">
-          <button class="btn primary" type="submit">💾 Save</button>
-          <a class="btn secondary" href="lorrylist.php">Cancel</a>
-        <?php else: ?>
-          <input type="hidden" name="action" value="add">
-          <button class="btn primary" type="submit">✅ Add Lorry</button>
+  <!-- Main content -->
+  <div class="shell">
+    <div class="topbar">
+      <h2>🚛 Lorry List</h2>
+      <span></span>
+    </div>
+
+    <?php if($msg): ?><div class="msg"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Vehicle No</th>
+            <th>Truck Type</th>
+            <th>Status</th>
+            <th style="width:240px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php if($res && $res->num_rows): while($row=$res->fetch_assoc()): $id=(int)$row['id']; ?>
+          <tr class="row-link" onclick="goRow('calculationInput.php?truck_id=<?= $id ?>')">
+            <td><?= htmlspecialchars($row['vehicle_no']) ?></td>
+            <td><?= htmlspecialchars($row['truck_type']) ?></td>
+            <td>
+              <?php
+                $status = $row['status'];
+                $class = '';
+                switch($status) {
+                  case 'Available': $class='status-available'; break;
+                  case 'Active': $class='status-active'; break;
+                  case 'In Transit': $class='status-intransit'; break;
+                  case 'Delivered': $class='status-delivered'; break;
+                  case 'Waiting for Load': $class='status-waiting'; break;
+                  case 'Out of Service': $class='status-outofservice'; break;
+                  case 'Maintenance': $class='status-maintenance'; break;
+                }
+                echo "<span class='status-badge $class'>".htmlspecialchars($status)."</span>";
+              ?>
+            </td>
+            <td class="actions" onclick="stopEvt(event)">
+              <form id="del-<?= $id ?>" method="post" style="display:inline">
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <input type="hidden" name="action" value="delete">
+                <button type="button" class="btn danger" onclick="confirmDel(<?= $id ?>)">Delete</button>
+              </form>
+              <a class="btn primary" href="calculationShow.php?truck_id=<?= $id ?>">📊 Trips</a>
+            </td>
+          </tr>
+        <?php endwhile; else: ?>
+          <tr><td colspan="4">No lorries yet.</td></tr>
         <?php endif; ?>
-      </div>
-    </form>
-  </div>-->
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /shell -->
 
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Vehicle No</th>
-          <th>Truck Type</th>
-          <th>Status</th>
-          <th style="width:240px">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php if($res && $res->num_rows): while($row=$res->fetch_assoc()): $id=(int)$row['id']; ?>
-        <tr class="row-link" onclick="goRow('calculationInput.php?truck_id=<?= $id ?>')">
-          <td><?= htmlspecialchars($row['vehicle_no']) ?></td>
-          <td><?= htmlspecialchars($row['truck_type']) ?></td>
-          <td>
-            <?php
-              $status = $row['status'];
-              $class = '';
-              switch($status) {
-                case 'Available': $class='status-available'; break;
-                case 'Active': $class='status-active'; break;
-                case 'In Transit': $class='status-intransit'; break;
-                case 'Delivered': $class='status-delivered'; break;
-                case 'Waiting for Load': $class='status-waiting'; break;
-                case 'Out of Service': $class='status-outofservice'; break;
-                case 'Maintenance': $class='status-maintenance'; break;
-              }
-              echo "<span class='status-badge $class'>".htmlspecialchars($status)."</span>";
-            ?>
-          </td>
-          <td class="actions" onclick="stopEvt(event)">
-            <!--<a class="btn secondary" href="lorrylist.php?edit_id=<?= $id ?>">Edit</a>-->
-            <form id="del-<?= $id ?>" method="post" style="display:inline">
-              <input type="hidden" name="id" value="<?= $id ?>">
-              <input type="hidden" name="action" value="delete">
-              <button type="button" class="btn danger" onclick="confirmDel(<?= $id ?>)">Delete</button>
-            </form>
-            <a class="btn primary" href="calculationShow.php?truck_id=<?= $id ?>">📊 Trips</a>
-          </td>
-        </tr>
-      <?php endwhile; else: ?>
-        <tr><td colspan="4">No lorries yet.</td></tr>
-      <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
+</div><!-- /container -->
 </body>
 </html>

@@ -80,6 +80,7 @@ $res = $mysqli->query("SELECT * FROM lorry_owners ORDER BY vehicle_no");
 <head>
 <meta charset="UTF-8">
 <title>HaulPro — Lorry Owners</title>
+<link rel="stylesheet" href="dashboad_style.css">
 <style>
 :root {
   --bg: #f9fafb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280;
@@ -88,7 +89,8 @@ $res = $mysqli->query("SELECT * FROM lorry_owners ORDER BY vehicle_no");
   --radius: 10px; --shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);margin:0; color:var(--text);line-height:1.5;}
-.shell{max-width:1500px;margin:32px auto;padding:0 16px;}
+.container{display:flex;}
+.shell{flex:1;max-width:1700px;margin:32px auto;padding:0 16px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
 h2{font-size:1.7rem;font-weight:700;text-align:center;flex-grow:1;color:var(--primary);}
 h3{margin-bottom:16px;font-size:1.2rem;color:var(--primary);}
@@ -115,16 +117,7 @@ tr:nth-child(even) td{background:#fdfdfd;}
 tr:hover td{background:#f1f5ff;}
 .actions{display:flex;gap:8px;}
 a{text-decoration:none;}
-
-/* Status Badges (lighter pastel colors) */
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: center;
-}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;text-align:center;}
 .status-available { background: #dcfce7; color: #166534; }
 .status-active { background: #dbeafe; color: #1e40af; }
 .status-intransit { background: #ffedd5; color: #9a3412; }
@@ -160,135 +153,168 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </head>
 <body>
-<div class="shell">
-  <div class="topbar">
-    <a class="btn link" href="Dashboard.html">⬅ Back to Dashboard</a>
-    <h2>🚚 Lorry Owner List</h2>
-    <span></span>
-  </div>
+<div class="container">
 
-  <?php if($msg): ?><div class="msg"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+  <!-- Sidebar (same as Dashboard) -->
+  <aside class="sidebar" id="sidebar">
+    <img src="Image/Logo.png" alt="HaulPro Logo" width="160" />
+    <h3>HaulPro</h3>
+    <ul class="menu">
+      <li><a href="dashboard.html"><img src="Image/dashboard.png" alt="" />Dashboard</a></li>
+      <li class="has-submenu">
+        <a href="#"><img src="Image/chart.png" alt="" />Analysis</a>
+        <ul class="submenu">
+          <li><a href="delivery_performance.php"><img src="Image/continuous-improvement.png" alt="" />Delivery Performance</a></li>
+          <li><a href="Revenue_analysis.php"><img src="Image/profit-margin.png" alt="" />Revenue Analysis</a></li>
+          <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><img src="Image/car.png" alt="" style="width:40px" />Vehicle</a></li>
+      <li><a href="#"><img src="Image/plus.png" alt="" style="width:40px" />Add Trips</a></li>
+      <li><a href="#"><img src="Image/wallet.png" alt="" style="width:40px" />Payment Method</a></li>
+      <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt="" style="width:40px" />Lorry Owner List</a></li>
+      <li><a href="lorrylist.php"><img src="Image/truck.png" alt="" style="width:40px" />Lorry List</a></li>
+      <li><a href="#"><img src="Image/settings.png" alt="" style="width:40px" />Settings</a></li>
+      <li><a href="faq.html"><img src="Image/faq.png" alt="" style="width:40px" />FAQ</a></li>
+    </ul>
+    <div class="help-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712002.png" alt="Help"/>
+      <p>Need Help?</p>
+      <button>Contact Now</button>
+    </div>
+  </aside>
 
-  <div class="card">
-    <h3><?= $edit_owner ? '✏️ Edit Lorry Owner' : '➕ Add Lorry Owner' ?></h3>
-    <form method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">
-      <div class="grid">
-        <div><label>Vehicle Number</label>
-          <input type="text" name="vehicle_no" required value="<?= htmlspecialchars($edit_owner['vehicle_no'] ?? '') ?>">
+  <!-- Main content -->
+  <div class="shell">
+    <div class="topbar">
+      <h2>🚚 Lorry Owner List</h2>
+      <span></span>
+    </div>
+
+    <?php if($msg): ?><div class="msg"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+
+    <div class="card">
+      <h3><?= $edit_owner ? '✏️ Edit Lorry Owner' : '➕ Add Lorry Owner' ?></h3>
+      <form method="post" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">
+        <div class="grid">
+          <div><label>Vehicle Number</label>
+            <input type="text" name="vehicle_no" required value="<?= htmlspecialchars($edit_owner['vehicle_no'] ?? '') ?>">
+          </div>
+          <div><label>Owner Type</label>
+            <select name="owner_type" required>
+              <?php
+                $types=['Company','Private'];
+                $cur=$edit_owner['owner_type'] ?? '';
+                foreach($types as $t){ $sel=($t===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($t)."</option>"; }
+              ?>
+            </select>
+          </div>
+          <div id="ownerNameDiv">
+            <label>Owner Name</label>
+            <input type="text" name="owner_name" value="<?= htmlspecialchars($edit_owner['owner_name'] ?? '') ?>">
+          </div>
+          <div><label>Truck Type</label>
+            <select name="truck_type" required>
+              <?php
+                $opts=['Small Truck','Medium Truck','Large Truck','Covered Van','Open Truck'];
+                $cur=$edit_owner['truck_type'] ?? '';
+                foreach($opts as $o){ $sel=($o===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($o)."</option>"; }
+              ?>
+            </select>
+          </div>
+          <div><label>Status</label>
+            <select name="status">
+              <?php
+                $sopts=['Available','Active','In Transit','Delivered','Waiting for Load','Out of Service','Maintenance'];
+                $cur=$edit_owner['status'] ?? 'Available';
+                foreach($sopts as $s){ $sel=($s===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($s)."</option>"; }
+              ?>
+            </select>
+          </div>
+          <div><label>Driver ID</label>
+            <input type="text" name="driver_id" value="<?= htmlspecialchars($edit_owner['driver_id'] ?? '') ?>">
+          </div>
+          <div id="contactDiv">
+            <label>Contact Number</label>
+            <input type="text" name="contact" value="<?= htmlspecialchars($edit_owner['contact'] ?? '') ?>">
+          </div>
+          <div><label>Address</label>
+            <input type="text" name="address" value="<?= htmlspecialchars($edit_owner['address'] ?? '') ?>">
+          </div>
+          <div><label>Capacity (tons)</label>
+            <input type="number" step="0.1" name="capacity" value="<?= htmlspecialchars($edit_owner['capacity'] ?? '') ?>">
+          </div>
         </div>
-        <div><label>Owner Type</label>
-          <select name="owner_type" required>
-            <?php
-              $types=['Company','Private'];
-              $cur=$edit_owner['owner_type'] ?? '';
-              foreach($types as $t){ $sel=($t===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($t)."</option>"; }
-            ?>
-          </select>
+        <div class="form-actions">
+          <?php if($edit_owner): ?>
+            <input type="hidden" name="id" value="<?= (int)$edit_owner['id'] ?>">
+            <input type="hidden" name="action" value="update">
+            <button class="btn primary" type="submit">💾 Save</button>
+            <a class="btn secondary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">Cancel</a>
+          <?php else: ?>
+            <input type="hidden" name="action" value="add">
+            <button class="btn primary" type="submit">✅ Add Owner</button>
+          <?php endif; ?>
         </div>
-        <div id="ownerNameDiv">
-          <label>Owner Name</label>
-          <input type="text" name="owner_name" value="<?= htmlspecialchars($edit_owner['owner_name'] ?? '') ?>">
-        </div>
-        <div><label>Truck Type</label>
-          <select name="truck_type" required>
-            <?php
-              $opts=['Small Truck','Medium Truck','Large Truck','Covered Van','Open Truck'];
-              $cur=$edit_owner['truck_type'] ?? '';
-              foreach($opts as $o){ $sel=($o===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($o)."</option>"; }
-            ?>
-          </select>
-        </div>
-        <div><label>Status</label>
-          <select name="status">
-            <?php
-              $sopts=['Available','Active','In Transit','Delivered','Waiting for Load','Out of Service','Maintenance'];
-              $cur=$edit_owner['status'] ?? 'Available';
-              foreach($sopts as $s){ $sel=($s===$cur)?'selected':''; echo "<option $sel>".htmlspecialchars($s)."</option>"; }
-            ?>
-          </select>
-        </div>
-        <div><label>Driver ID</label>
-          <input type="text" name="driver_id" value="<?= htmlspecialchars($edit_owner['driver_id'] ?? '') ?>">
-        </div>
-        <div id="contactDiv">
-          <label>Contact Number</label>
-          <input type="text" name="contact" value="<?= htmlspecialchars($edit_owner['contact'] ?? '') ?>">
-        </div>
-        <div><label>Address</label>
-          <input type="text" name="address" value="<?= htmlspecialchars($edit_owner['address'] ?? '') ?>">
-        </div>
-        <div><label>Capacity (tons)</label>
-          <input type="number" step="0.1" name="capacity" value="<?= htmlspecialchars($edit_owner['capacity'] ?? '') ?>">
-        </div>
-      </div>
-      <div class="form-actions">
-        <?php if($edit_owner): ?>
-          <input type="hidden" name="id" value="<?= (int)$edit_owner['id'] ?>">
-          <input type="hidden" name="action" value="update">
-          <button class="btn primary" type="submit">💾 Save</button>
-          <a class="btn secondary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">Cancel</a>
-        <?php else: ?>
-          <input type="hidden" name="action" value="add">
-          <button class="btn primary" type="submit">✅ Add Owner</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Vehicle No</th>
+            <th>Owner</th>
+            <th>Truck Type</th>
+            <th>Status</th>
+            <th>Driver ID</th>
+            <th>Contact</th>
+            <th>Capacity</th>
+            <th style="width:200px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php if($res && $res->num_rows): while($row=$res->fetch_assoc()): $id=(int)$row['id']; ?>
+          <tr>
+            <td><?= htmlspecialchars($row['vehicle_no']) ?></td>
+            <td><?= $row['owner_type']==='Company' ? 'Company-Owned' : htmlspecialchars($row['owner_name']) ?></td>
+            <td><?= htmlspecialchars($row['truck_type']) ?></td>
+            <td>
+              <?php
+                $status = $row['status'];
+                $class = '';
+                switch($status) {
+                  case 'Available': $class='status-available'; break;
+                  case 'Active': $class='status-active'; break;
+                  case 'In Transit': $class='status-intransit'; break;
+                  case 'Delivered': $class='status-delivered'; break;
+                  case 'Waiting for Load': $class='status-waiting'; break;
+                  case 'Out of Service': $class='status-outofservice'; break;
+                  case 'Maintenance': $class='status-maintenance'; break;
+                }
+                echo "<span class='status-badge $class'>".htmlspecialchars($status)."</span>";
+              ?>
+            </td>
+            <td><?= htmlspecialchars($row['driver_id']) ?></td>
+            <td><?= $row['owner_type']==='Company' ? '—' : htmlspecialchars($row['contact']) ?></td>
+            <td><?= htmlspecialchars($row['capacity']) ?> tons</td>
+            <td class="actions">
+              <a class="btn secondary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>?edit_id=<?= $id ?>">Edit</a>
+              <form id="del-<?= $id ?>" method="post" style="display:inline">
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <input type="hidden" name="action" value="delete">
+                <button type="button" class="btn danger" onclick="confirmDel(<?= $id ?>)">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <?php endwhile; else: ?>
+          <tr><td colspan="8">No lorry owners yet.</td></tr>
         <?php endif; ?>
-      </div>
-    </form>
-  </div>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /shell -->
 
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Vehicle No</th>
-          <th>Owner</th>
-          <th>Truck Type</th>
-          <th>Status</th>
-          <th>Driver ID</th>
-          <th>Contact</th>
-          <th>Capacity</th>
-          <th style="width:200px">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php if($res && $res->num_rows): while($row=$res->fetch_assoc()): $id=(int)$row['id']; ?>
-        <tr>
-          <td><?= htmlspecialchars($row['vehicle_no']) ?></td>
-          <td><?= $row['owner_type']==='Company' ? 'Company-Owned' : htmlspecialchars($row['owner_name']) ?></td>
-          <td><?= htmlspecialchars($row['truck_type']) ?></td>
-          <td>
-            <?php
-              $status = $row['status'];
-              $class = '';
-              switch($status) {
-                case 'Available': $class='status-available'; break;
-                case 'Active': $class='status-active'; break;
-                case 'In Transit': $class='status-intransit'; break;
-                case 'Delivered': $class='status-delivered'; break;
-                case 'Waiting for Load': $class='status-waiting'; break;
-                case 'Out of Service': $class='status-outofservice'; break;
-                case 'Maintenance': $class='status-maintenance'; break;
-              }
-              echo "<span class='status-badge $class'>".htmlspecialchars($status)."</span>";
-            ?>
-          </td>
-          <td><?= htmlspecialchars($row['driver_id']) ?></td>
-          <td><?= $row['owner_type']==='Company' ? '—' : htmlspecialchars($row['contact']) ?></td>
-          <td><?= htmlspecialchars($row['capacity']) ?> tons</td>
-          <td class="actions">
-            <a class="btn secondary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>?edit_id=<?= $id ?>">Edit</a>
-            <form id="del-<?= $id ?>" method="post" style="display:inline">
-              <input type="hidden" name="id" value="<?= $id ?>">
-              <input type="hidden" name="action" value="delete">
-              <button type="button" class="btn danger" onclick="confirmDel(<?= $id ?>)">Delete</button>
-            </form>
-          </td>
-        </tr>
-      <?php endwhile; else: ?>
-        <tr><td colspan="8">No lorry owners yet.</td></tr>
-      <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
+</div><!-- /container -->
 </body>
 </html>

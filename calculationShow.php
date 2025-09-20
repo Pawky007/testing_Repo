@@ -58,6 +58,7 @@ while($r=$res->fetch_assoc()){
 <head>
 <meta charset="UTF-8">
 <title>Trips — <?= htmlspecialchars($truck['vehicle_no']) ?></title>
+<link rel="stylesheet" href="dashboad_style.css">
 <style>
 :root {
   --bg: #f9fafb; --surface: #ffffff; --text: #1f2937; --muted: #6b7280;
@@ -67,7 +68,11 @@ while($r=$res->fetch_assoc()){
   --pos:#166534; --neg:#991b1b;
 }
 body{font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg);margin:0;color:var(--text);}
-.shell{max-width:1500px;margin:32px auto;padding:0 16px;}
+.container { display:flex; }
+main { flex:1; padding:24px; }
+
+/* FIX: make shell full width */
+.shell{width:100%; max-width:100%; margin:0; padding:0 16px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
 h2,h3{color:var(--primary);}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:50px;border:none;font-size:16px;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.1s;text-decoration:none;}
@@ -78,7 +83,9 @@ h2,h3{color:var(--primary);}
 .btn.danger{background:var(--danger);color:#fff;}
 .btn.danger:hover{background:var(--danger-hover);}
 .btn.secondary{background:#eef2ff;color:var(--primary);}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;}
+
+/* FIX: card/table full width */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;width:100%;}
 .filters{display:flex;gap:12px;margin:10px 0;align-items:center;flex-wrap:wrap}
 table{width:100%;border-collapse:collapse;font-size:18px;border-radius:var(--radius);overflow:hidden;}
 th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:center;}
@@ -162,107 +169,140 @@ function openReceipt(data){
 </script>
 </head>
 <body>
-<div class="shell">
-  <div class="topbar">
-    <a class="btn link" href="lorrylist.php">⬅ Lorries</a>
-    <div><strong><?= htmlspecialchars($truck['vehicle_no']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?></div>
-    <a class="btn primary" href="calculationInput.php?truck_id=<?= (int)$truck_id ?>">+ New Trip</a>
-  </div>
+<div class="container">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <img src="Image/Logo.png" alt="HaulPro Logo" width="160"/>
+    <h3>HaulPro</h3>
+    <ul class="menu">
+      <li><a href="dashboard.html"><img src="Image/dashboard.png" alt=""/>Dashboard</a></li>
+      <li class="has-submenu">
+        <a href="#"><img src="Image/chart.png" alt=""/>Analysis</a>
+        <ul class="submenu">
+          <li><a href="delivery_performance.php"><img src="Image/continuous-improvement.png" alt=""/>Delivery Performance</a></li>
+          <li><a href="revenue_analysis.html"><img src="Image/profit-margin.png" alt=""/>Revenue Analysis</a></li>
+          <li><a href="fleet_efficiency.html"><img src="Image/delivery-truck.png" alt=""/>Fleet Efficiency</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><img src="Image/car.png" alt=""/>Vehicle</a></li>
+      <li><a href="calculationInput.php?truck_id=<?= (int)$truck_id ?>"><img src="Image/plus.png" alt=""/>Add Trips</a></li>
+      <li><a href="#"><img src="Image/wallet.png" alt=""/>Payment Method</a></li>
+      <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt=""/>Lorry Owner List</a></li>
+      <li><a href="lorrylist.php"><img src="Image/truck.png" alt=""/>Lorry List</a></li>
+      <li><a href="#"><img src="Image/settings.png" alt=""/>Settings</a></li>
+      <li><a href="faq.html"><img src="Image/faq.png" alt=""/>FAQ</a></li>
+    </ul>
+    <div class="help-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712002.png" alt="Help"/>
+      <p>Need Help?</p>
+      <button>Contact Now</button>
+    </div>
+  </aside>
 
-  <div class="card">
-    <div class="filters">
-      <form method="get" style="display:flex;gap:8px;align-items:center">
-        <input type="hidden" name="truck_id" value="<?= (int)$truck_id ?>">
-        <label>From <input type="date" name="from" value="<?= htmlspecialchars($from) ?>"></label>
-        <label>To <input type="date" name="to" value="<?= htmlspecialchars($to) ?>"></label>
-        <button class="btn primary" type="submit">Filter</button>
-        <a class="btn secondary" href="calculationShow.php?truck_id=<?= (int)$truck_id ?>">Reset</a>
-      </form>
-      <div class="ranges" style="margin-left:auto;display:flex;gap:6px">
-        <button class="btn secondary" onclick="setRange(10)">10 days</button>
-        <button class="btn secondary" onclick="setRange(30)">1 month</button>
-        <button class="btn secondary" onclick="setRange(180)">6 months</button>
-        <button class="btn secondary" onclick="setRange(365)">1 year</button>
-        <button class="btn secondary" onclick="setRange('all')">All</button>
+  <!-- Main -->
+  <main>
+    <div class="shell">
+      <div class="topbar">
+        <div><strong><?= htmlspecialchars($truck['vehicle_no']) ?></strong> — <?= htmlspecialchars($truck['truck_type']) ?></div>
+        <a class="btn primary" href="calculationInput.php?truck_id=<?= (int)$truck_id ?>">+ New Trip</a>
+      </div>
+
+      <div class="card">
+        <div class="filters">
+          <form method="get" style="display:flex;gap:8px;align-items:center">
+            <input type="hidden" name="truck_id" value="<?= (int)$truck_id ?>">
+            <label>From <input type="date" name="from" value="<?= htmlspecialchars($from) ?>"></label>
+            <label>To <input type="date" name="to" value="<?= htmlspecialchars($to) ?>"></label>
+            <button class="btn primary" type="submit">Filter</button>
+            <a class="btn secondary" href="calculationShow.php?truck_id=<?= (int)$truck_id ?>">Reset</a>
+          </form>
+          <div class="ranges" style="margin-left:auto;display:flex;gap:6px">
+            <button class="btn secondary" type="button" onclick="setRange(10)">10 days</button>
+            <button class="btn secondary" type="button" onclick="setRange(30)">1 month</button>
+            <button class="btn secondary" type="button" onclick="setRange(180)">6 months</button>
+            <button class="btn secondary" type="button" onclick="setRange(365)">1 year</button>
+            <button class="btn secondary" type="button" onclick="setRange('all')">All</button>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Route</th>
+              <th>Type</th>
+              <th>Distance</th>
+              <th>Revenue</th>
+              <th>Expense</th>
+              <th>Profit</th>
+              <th>Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if($rows): foreach($rows as $r):
+              $dateBD = date('d/m/Y', strtotime($r['trip_date']));
+              $route  = $r['route_from'].' → '.$r['route_to'];
+              $distance = number_format($r['distance_km']);
+              $revenue  = number_format($r['revenue_bdt']);
+              $expense  = number_format($r['expense']);
+              $profit   = number_format($r['profit']);
+              $driver_fee = number_format($r['driver_fee']);
+              $fuel_cost  = number_format($r['fuel_cost']);
+              $toll_cost  = number_format($r['toll_cost']);
+              $labor_cost = number_format($r['labor_cost']);
+              $gate_cost  = number_format($r['gate_cost']);
+              $other_cost = number_format($r['other_cost']);
+              $receipt = $r['receipt_no'] ?: ('#'.$r['id']);
+            ?>
+              <tr>
+                <td><?= htmlspecialchars($dateBD) ?></td>
+                <td><?= htmlspecialchars($route) ?></td>
+                <td><?= htmlspecialchars($r['trip_type']) ?></td>
+                <td><?= htmlspecialchars($distance) ?> km</td>
+                <td>৳<?= htmlspecialchars($revenue) ?></td>
+                <td>৳<?= htmlspecialchars($expense) ?></td>
+                <td class="<?= $r['profit']>=0?'profit-positive':'profit-negative' ?>">৳<?= htmlspecialchars($profit) ?></td>
+                <td>
+                  <button
+                    class="btn secondary"
+                    onclick='openReceipt({
+                      receipt: <?= json_encode($receipt) ?>,
+                      truck:   <?= json_encode($truck["vehicle_no"]) ?>,
+                      date:    <?= json_encode($dateBD) ?>,
+                      route:   <?= json_encode($route) ?>,
+                      type:    <?= json_encode($r["trip_type"]) ?>,
+                      distance: <?= json_encode($distance) ?>,
+                      revenue:  <?= json_encode($revenue) ?>,
+                      driver_fee: <?= json_encode($driver_fee) ?>,
+                      fuel_cost:  <?= json_encode($fuel_cost) ?>,
+                      toll_cost:  <?= json_encode($toll_cost) ?>,
+                      labor_cost: <?= json_encode($labor_cost) ?>,
+                      gate_cost:  <?= json_encode($gate_cost) ?>,
+                      other_cost: <?= json_encode($other_cost) ?>,
+                      expense: <?= json_encode($expense) ?>,
+                      profit:  <?= json_encode($profit) ?>,
+                      driver_name:  <?= json_encode($r["driver_name"]) ?>,
+                      driver_phone: <?= json_encode($r["driver_phone"]) ?>
+                    })'>
+                    Receipt
+                  </button>
+                </td>
+              </tr>
+            <?php endforeach; else: ?>
+              <tr><td colspan="8">No trips in this range.</td></tr>
+            <?php endif; ?>
+            <tr class="totals">
+              <td colspan="4">TOTAL (<?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?>)</td>
+              <td>৳<?= number_format($totalRevenue) ?></td>
+              <td>৳<?= number_format($totalExpense) ?></td>
+              <td>৳<?= number_format($totalProfit) ?></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Route</th>
-          <th>Type</th>
-          <th>Distance</th>
-          <th>Revenue</th>
-          <th>Expense</th>
-          <th>Profit</th>
-          <th>Receipt</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if($rows): foreach($rows as $r):
-          $dateBD = date('d/m/Y', strtotime($r['trip_date']));
-          $route  = $r['route_from'].' → '.$r['route_to'];
-          $distance = number_format($r['distance_km']);
-          $revenue  = number_format($r['revenue_bdt']);
-          $expense  = number_format($r['expense']);
-          $profit   = number_format($r['profit']);
-          $driver_fee = number_format($r['driver_fee']);
-          $fuel_cost  = number_format($r['fuel_cost']);
-          $toll_cost  = number_format($r['toll_cost']);
-          $labor_cost = number_format($r['labor_cost']);
-          $gate_cost  = number_format($r['gate_cost']);
-          $other_cost = number_format($r['other_cost']);
-          $receipt = $r['receipt_no'] ?: ('#'.$r['id']);
-        ?>
-          <tr>
-            <td><?= htmlspecialchars($dateBD) ?></td>
-            <td><?= htmlspecialchars($route) ?></td>
-            <td><?= htmlspecialchars($r['trip_type']) ?></td>
-            <td><?= htmlspecialchars($distance) ?> km</td>
-            <td>৳<?= htmlspecialchars($revenue) ?></td>
-            <td>৳<?= htmlspecialchars($expense) ?></td>
-            <td class="<?= $r['profit']>=0?'profit-positive':'profit-negative' ?>">৳<?= htmlspecialchars($profit) ?></td>
-            <td>
-              <button
-                class="btn secondary"
-                onclick='openReceipt({
-                  receipt: <?= json_encode($receipt) ?>,
-                  truck:   <?= json_encode($truck["vehicle_no"]) ?>,
-                  date:    <?= json_encode($dateBD) ?>,
-                  route:   <?= json_encode($route) ?>,
-                  type:    <?= json_encode($r["trip_type"]) ?>,
-                  distance: <?= json_encode($distance) ?>,
-                  revenue:  <?= json_encode($revenue) ?>,
-                  driver_fee: <?= json_encode($driver_fee) ?>,
-                  fuel_cost:  <?= json_encode($fuel_cost) ?>,
-                  toll_cost:  <?= json_encode($toll_cost) ?>,
-                  labor_cost: <?= json_encode($labor_cost) ?>,
-                  gate_cost:  <?= json_encode($gate_cost) ?>,
-                  other_cost: <?= json_encode($other_cost) ?>,
-                  expense: <?= json_encode($expense) ?>,
-                  profit:  <?= json_encode($profit) ?>,
-                  driver_name:  <?= json_encode($r["driver_name"]) ?>,
-                  driver_phone: <?= json_encode($r["driver_phone"]) ?>
-                })'>
-                Receipt
-              </button>
-            </td>
-          </tr>
-        <?php endforeach; else: ?>
-          <tr><td colspan="8">No trips in this range.</td></tr>
-        <?php endif; ?>
-        <tr class="totals">
-          <td colspan="4">TOTAL (<?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?>)</td>
-          <td>৳<?= number_format($totalRevenue) ?></td>
-          <td>৳<?= number_format($totalExpense) ?></td>
-          <td>৳<?= number_format($totalProfit) ?></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  </main>
 </div>
 </body>
 </html>
