@@ -18,11 +18,28 @@
     .dashboard{width:100%;}
     .content-wrap{max-width:var(--maxw); margin:0 auto; padding:20px;}
 
-    /* tabs */
-    .tabs{display:flex; gap:10px; margin:10px 0 20px}
-    .tab-btn{padding:10px 18px; border:0; border-radius:8px; background:#f1f5f9; color:#334155; font-weight:600; cursor:pointer; transition:.25s}
-    .tab-btn.active{background:var(--brand); color:#fff; box-shadow:var(--shadow)}
-    .tab{display:none} .tab.active{display:block; animation:fade .35s ease}
+    /* pill-style tabs */
+    .tabs{display:flex; gap:12px; margin:10px 0 20px}
+    .tab-btn{
+      padding:10px 20px;
+      border:1px solid #e2e8f0;
+      border-radius:999px; /* pill look */
+      background:#fff;
+      color:#334155;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .25s;
+      box-shadow:0 1px 3px rgba(0,0,0,0.05);
+    }
+    .tab-btn:hover{background:#f1f5f9;}
+    .tab-btn.active{
+      background:var(--brand);
+      color:#fff;
+      border-color:var(--brand);
+      box-shadow:0 3px 10px rgba(0,123,255,0.3);
+    }
+    .tab{display:none} 
+    .tab.active{display:block; animation:fade .35s ease}
     @keyframes fade{from{opacity:0; transform:translateY(10px);}to{opacity:1; transform:translateY(0);}}
 
     /* cards */
@@ -44,7 +61,7 @@
     .chart-wrap{position:relative; width:100%}
     .h200{height:200px}
     .h220{height:220px}
-    .h320{height:320px} /* carrier chart height only */
+    .h320{height:320px}
     .chart-wrap canvas{position:absolute; inset:0; width:100% !important; height:100% !important}
 
     /* table */
@@ -68,7 +85,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- Sidebar (unchanged) -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <img src="Image/Logo.png" alt="HaulPro Logo" width="160"/>
       <h3>HaulPro</h3>
@@ -78,8 +95,8 @@
           <a href="#"><img src="Image/chart.png" alt="" style="width:40px"/>Analysis</a>
           <ul class="submenu" style="padding-left:45px;">
             <li><a href="delivery_performance.php"><img src="Image/continuous-improvement.png" alt="" />Delivery Performance</a></li>
-          <li><a href="Revenue_analysis.php"><img src="Image/profit-margin.png" alt="" />Revenue Analysis</a></li>
-          <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
+            <li><a href="Revenue_analysis.php"><img src="Image/profit-margin.png" alt="" />Revenue Analysis</a></li>
+            <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
           </ul>
         </li>
         <li><a href="#"><img src="Image/car.png" alt="" style="width:40px"/>Vehicle</a></li>
@@ -133,7 +150,19 @@
               <div class="body"><div class="chart-wrap h220"><canvas id="delayChart"></canvas></div></div>
             </div>
           </div>
-          <div class="panel"> <div class="hd"><h3>Recent Deliveries</h3></div> <div class="body" style="padding:0"> <table> <thead><tr><th>ID</th><th>Origin</th><th>Destination</th><th>Status</th><th>Time</th></tr></thead> <tbody> <tr><td>#D1234</td><td>Dhaka</td><td>Chittagong</td><td>On-Time</td><td>2025-09-10</td></tr> <tr><td>#D1235</td><td>Khulna</td><td>Dhaka</td><td>Late</td><td>2025-09-11</td></tr> <tr><td>#D1236</td><td>Rajshahi</td><td>Sylhet</td><td>On-Time</td><td>2025-09-12</td></tr> </tbody> </table> </div> </div>
+          <div class="panel">
+            <div class="hd"><h3>Recent Deliveries</h3></div>
+            <div class="body" style="padding:0">
+              <table>
+                <thead><tr><th>ID</th><th>Origin</th><th>Destination</th><th>Status</th><th>Time</th></tr></thead>
+                <tbody>
+                  <tr><td>#D1234</td><td>Dhaka</td><td>Chittagong</td><td>On-Time</td><td>2025-09-10</td></tr>
+                  <tr><td>#D1235</td><td>Khulna</td><td>Dhaka</td><td>Late</td><td>2025-09-11</td></tr>
+                  <tr><td>#D1236</td><td>Rajshahi</td><td>Sylhet</td><td>On-Time</td><td>2025-09-12</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         <!-- CARRIERS -->
