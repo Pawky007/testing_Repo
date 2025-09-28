@@ -139,8 +139,7 @@
           <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
           </ul>
         </li>
-        <li><a href="#"><img src="Image/car.png" alt=""/>Vehicle</a></li>
-        <li><a href="#"><img src="Image/plus.png" alt=""/>Add Trips</a></li>
+        <li><a href="calculationInput.php"><img src="Image/plus.png" alt=""/>Add Trips</a></li>
         <li><a href="#"><img src="Image/wallet.png" alt=""/>Payment Method</a></li>
         <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt=""/>Lorry Owner List</a></li>
         <li><a href="lorrylist.php"><img src="Image/truck.png" alt=""/>Lorry List</a></li>

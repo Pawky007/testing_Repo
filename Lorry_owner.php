@@ -169,8 +169,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
         </ul>
       </li>
-      <li><a href="#"><img src="Image/car.png" alt="" style="width:40px" />Vehicle</a></li>
-      <li><a href="#"><img src="Image/plus.png" alt="" style="width:40px" />Add Trips</a></li>
+      <li><a href="calculationInput.php"><img src="Image/plus.png" alt="" style="width:40px" />Add Trips</a></li>
       <li><a href="#"><img src="Image/wallet.png" alt="" style="width:40px" />Payment Method</a></li>
       <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt="" style="width:40px" />Lorry Owner List</a></li>
       <li><a href="lorrylist.php"><img src="Image/truck.png" alt="" style="width:40px" />Lorry List</a></li>

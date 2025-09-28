@@ -184,7 +184,6 @@ function openReceipt(data){
           <li><a href="fleet_efficiency.html"><img src="Image/delivery-truck.png" alt=""/>Fleet Efficiency</a></li>
         </ul>
       </li>
-      <li><a href="#"><img src="Image/car.png" alt=""/>Vehicle</a></li>
       <li><a href="calculationInput.php?truck_id=<?= (int)$truck_id ?>"><img src="Image/plus.png" alt=""/>Add Trips</a></li>
       <li><a href="#"><img src="Image/wallet.png" alt=""/>Payment Method</a></li>
       <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt=""/>Lorry Owner List</a></li>

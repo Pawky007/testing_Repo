@@ -1,24 +1,40 @@
 <?php
-require __DIR__.'/db.php';
+/*******************************
+ * HaulPro — Lorry List (PHP, 1-file)
+ * - Manage lorries (CRUD)
+ * - Show styled list with status badges
+ *******************************/
+
+/* ====== DB CONFIG: UPDATE THESE ====== */
+$db_host = "localhost";
+$db_user = "root";
+$db_pass = "";
+$db_name = "webtech_project";
+
+/* ====== CONNECT DB ====== */
+$mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_name);
+if ($mysqli->connect_errno) {
+  die("Database connection failed: " . $mysqli->connect_error);
+}
 
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $action = $_POST['action'] ?? '';
   try {
     if ($action === 'add') {
-      $reg  = trim($_POST['vehicle_no'] ?? '');
-      $type = trim($_POST['truck_type'] ?? '');
+      $reg    = trim($_POST['vehicle_no'] ?? '');
+      $type   = trim($_POST['truck_type'] ?? '');
       $status = trim($_POST['status'] ?? 'Available');
       if ($reg === '' || $type === '') throw new Exception('Vehicle number and truck type are required.');
 
       $stm = $mysqli->prepare("INSERT INTO lorry_owners (vehicle_no, truck_type, status) VALUES (?,?,?)");
       $stm->bind_param('sss', $reg, $type, $status);
       $stm->execute();
-      $msg = 'Lorry added.';
+      $msg = '✅ Lorry added.';
     } elseif ($action === 'update') {
-      $id   = (int)($_POST['id'] ?? 0);
-      $reg  = trim($_POST['vehicle_no'] ?? '');
-      $type = trim($_POST['truck_type'] ?? '');
+      $id     = (int)($_POST['id'] ?? 0);
+      $reg    = trim($_POST['vehicle_no'] ?? '');
+      $type   = trim($_POST['truck_type'] ?? '');
       $status = trim($_POST['status'] ?? 'Available');
       if ($id<=0) throw new Exception('Invalid lorry id.');
       if ($reg === '' || $type === '') throw new Exception('Vehicle number and truck type are required.');
@@ -26,27 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stm = $mysqli->prepare("UPDATE lorry_owners SET vehicle_no=?, truck_type=?, status=? WHERE id=?");
       $stm->bind_param('sssi', $reg, $type, $status, $id);
       $stm->execute();
-      $msg = 'Lorry updated.';
+      $msg = '✅ Lorry updated.';
     } elseif ($action === 'delete') {
       $id = (int)($_POST['id'] ?? 0);
       if ($id<=0) throw new Exception('Invalid lorry id.');
       $stm = $mysqli->prepare("DELETE FROM lorry_owners WHERE id=?");
       $stm->bind_param('i', $id);
       $stm->execute();
-      $msg = 'Lorry deleted.';
+      $msg = '🗑️ Lorry deleted.';
     }
   } catch(Throwable $e) {
     $msg = 'Error: '.$e->getMessage();
   }
-}
-
-$edit_id = isset($_GET['edit_id']) ? (int)$_GET['edit_id'] : 0;
-$edit_truck = null;
-if ($edit_id) {
-  $st = $mysqli->prepare("SELECT id, vehicle_no, truck_type, status FROM lorry_owners WHERE id=?");
-  $st->bind_param('i', $edit_id);
-  $st->execute();
-  $edit_truck = $st->get_result()->fetch_assoc();
 }
 
 $res = $mysqli->query("SELECT id, vehicle_no, truck_type, status FROM lorry_owners ORDER BY vehicle_no");
@@ -71,12 +78,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);margin:0;colo
 h2{font-size:1.7rem;font-weight:700;text-align:center;flex-grow:1;color:var(--primary);}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:50px;border:none;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.1s;text-decoration:none;}
 .btn:hover{transform:translateY(-1px);}
-.btn.link{background:transparent;border:1px solid var(--border);color:var(--text);}
 .btn.primary{background:var(--primary);color:#fff;}
 .btn.primary:hover{background:var(--primary-hover);}
 .btn.danger{background:var(--danger);color:#fff;}
 .btn.danger:hover{background:var(--danger-hover);}
-.btn.secondary{background:#eef2ff;color:var(--primary);}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;}
 table{width:100%;border-collapse:collapse;font-size:16px;border-radius:var(--radius);overflow:hidden;}
 th,td{padding:14px 16px;border-bottom:1px solid var(--border);}
@@ -93,6 +98,7 @@ tr:hover td{background:#f1f5ff;}
 .status-waiting{background:#ede9fe;color:#5b21b6;}
 .status-outofservice{background:#fee2e2;color:#991b1b;}
 .status-maintenance{background:#fef9c3;color:#854d0e;}
+.msg {margin:10px 0;padding:10px 16px;border-radius:var(--radius);background:#e0f2fe;color:#0369a1;font-weight:500;}
 </style>
 <script>
 function confirmDel(id){
@@ -107,12 +113,12 @@ function stopEvt(e){ e.stopPropagation(); }
 <body>
 <div class="container">
 
-  <!-- Sidebar (from dashboard) -->
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <img src="Image/Logo.png" alt="HaulPro Logo" width="160" />
     <h3>HaulPro</h3>
     <ul class="menu">
-      <li><a href="dashboard.html"><img src="Image/dashboard.png" alt="" />Dashboard</a></li>
+      <li><a href="dashboard.php"><img src="Image/dashboard.png" alt="" />Dashboard</a></li>
       <li class="has-submenu">
         <a href="#"><img src="Image/chart.png" alt="" />Analysis</a>
         <ul class="submenu">
@@ -121,9 +127,9 @@ function stopEvt(e){ e.stopPropagation(); }
           <li><a href="fleet_analysis.php"><img src="Image/delivery-truck.png" alt="" />Fleet Efficiency</a></li>
         </ul>
       </li>
-      <li><a href="#"><img src="Image/car.png" alt="" style="width:40px" />Vehicle</a></li>
-      <li><a href="#"><img src="Image/plus.png" alt="" style="width:40px" />Add Trips</a></li>
-      <li><a href="#"><img src="Image/wallet.png" alt="" style="width:40px" />Payment Method</a></li>
+
+      <li><a href="calculationInput.php"><img src="Image/plus.png" alt="" style="width:40px" />Add Trips</a></li>
+      <li><a href="Payment_customer.php"><img src="Image/wallet.png" alt="" style="width:40px" />Payment Method</a></li>
       <li><a href="Lorry_owner.php"><img src="Image/businessman.png" alt="" style="width:40px" />Lorry Owner List</a></li>
       <li><a href="lorrylist.php"><img src="Image/truck.png" alt="" style="width:40px" />Lorry List</a></li>
       <li><a href="#"><img src="Image/settings.png" alt="" style="width:40px" />Settings</a></li>
@@ -138,11 +144,7 @@ function stopEvt(e){ e.stopPropagation(); }
 
   <!-- Main content -->
   <div class="shell">
-    <div class="topbar">
-      <h2>🚛 Lorry List</h2>
-      <span></span>
-    </div>
-
+    <div class="topbar"><h2>🚛 Lorry List</h2><span></span></div>
     <?php if($msg): ?><div class="msg"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
 
     <div class="card">

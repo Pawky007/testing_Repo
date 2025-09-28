@@ -1,9 +1,13 @@
 <?php
 // db.php
-date_default_timezone_set('Asia/Dhaka');
+$DB_HOST = "localhost";
+$DB_USER = "root";
+$DB_PASS = "";
+$DB_NAME = "webtech_project";
 
-/* SHOW mysqli errors as exceptions (very important for debugging) */
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$mysqli = new mysqli('localhost', 'root', '', 'webtech_project');
-$mysqli->set_charset('utf8mb4');
+$mysqli = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+if ($mysqli->connect_errno) {
+  http_response_code(500);
+  die("DB connection failed: ".$mysqli->connect_error);
+}
+$mysqli->set_charset("utf8mb4");
