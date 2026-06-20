@@ -30,39 +30,6 @@ A full-stack **web application for managing a trucking / haulage business**, bui
 
 ---
 
-## 🖼️ Screenshots
-
-### Authentication
-<p align="center"><img src="Image/screen_01_login.jpg" alt="Login / Register" width="85%"></p>
-
-### Admin Area
-| Admin Dashboard | Registered Clients |
-|---|---|
-| ![Admin dashboard](Image/screen_02_admin_dashboard.jpg) | ![Clients](Image/screen_03_admin_clients.jpg) |
-
-| Manage Vehicles | Client Payments | Settings |
-|---|---|---|
-| ![Vehicles](Image/screen_04_admin_vehicles.jpg) | ![Payments](Image/screen_05_admin_payment.jpg) | ![Settings](Image/screen_06_admin_settings.jpg) |
-
-### Fleet & Trips
-| Lorry Owner Management | Lorry List | Trip Distance Calculator |
-|---|---|---|
-| ![Lorry owner](Image/screen_07_lorry_owner.jpg) | ![Lorry list](Image/screen_08_lorry_list.jpg) | ![Calculator](Image/screen_14_trip_calculation.jpg) |
-
-### Customer & Payments
-| Payment Center | Customer Settings |
-|---|---|
-| ![Payment center](Image/screen_09_customer_payment.jpg) | ![Customer settings](Image/screen_10_customer_settings.jpg) |
-
-### Analytics
-| Revenue Analysis | Fleet Analysis | Delivery Performance |
-|---|---|---|
-| ![Revenue](Image/screen_11_revenue_analysis.jpg) | ![Fleet](Image/screen_12_fleet_analysis.jpg) | ![Delivery](Image/screen_13_delivery_performance.jpg) |
-
-### Support
-<p align="center"><img src="Image/screen_15_faq.jpg" alt="FAQ" width="70%"></p>
-
----
 
 ## 🛠️ Tech Stack
 
